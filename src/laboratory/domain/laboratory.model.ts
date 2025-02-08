@@ -1,9 +1,8 @@
-export interface LaboratoryDto {
+export interface Laboratory {
+  id: string;
   name: string;
   region: string;
   town: string;
 }
 
-export interface Laboratory extends LaboratoryDto {
-  id: string;
-}
+export type LaboratoryDto = Omit<Laboratory, 'id'>;

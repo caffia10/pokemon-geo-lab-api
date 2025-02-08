@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { Laboratory } from '../domain/laboratory.model';
 import { LaboratoryRepository } from '../domain/laboratory.repository';
 import { DataBase } from 'src/server/infrastructure/db/db.type';
@@ -49,7 +49,7 @@ export class LaboratoryPostgresqlRepository implements LaboratoryRepository {
         },
         'unexpected error at retrieving laboratory',
       );
-      throw new Error('Laboratory not found');
+      throw error;
     }
 
     if (!laboratory) {
@@ -59,7 +59,7 @@ export class LaboratoryPostgresqlRepository implements LaboratoryRepository {
         },
         'laboratory not found with',
       );
-      throw new Error('Laboratory not found');
+      throw new NotFoundException('Laboratory not found');
     }
 
     return laboratory;
