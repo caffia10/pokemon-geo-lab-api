@@ -1,5 +1,9 @@
-import { laboratoryTable } from 'src/laboratory/infrastructure/laboratory.schema';
+import { buildingTable } from 'src/building/infrastructure/building.schema';
+import { regionTable } from 'src/region/infrastructure/region.schema';
+import { townTable } from 'src/town/infrastructure/town.schema';
 
 export const schema = {
-  laboratoryTable,
+  buildingTable,
+  townTable,
+  regionTable,
 };
