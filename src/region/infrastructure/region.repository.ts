@@ -1,9 +1,17 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-import { Region, RegionRepository } from '../domain/region.types';
+import {
+  Region,
+  RegionDetailed,
+  RegionRepository,
+} from '../domain/region.types';
 import { DataBase } from 'src/server/infrastructure/db/db.type';
 import pino from 'pino';
 import { regionTable } from './region.schema';
 import { eq } from 'drizzle-orm';
+import { townTable } from 'src/town/infrastructure/town.schema';
+import { buildingTable } from 'src/building/infrastructure/building.schema';
+import { Building, buildingTypeEnum } from 'src/building/domain/building.types';
+import { TownDetailed } from 'src/town/domain/town.types';
 
 @Injectable()
 export class RegionPostgresqlRepository implements RegionRepository {
@@ -20,7 +28,7 @@ export class RegionPostgresqlRepository implements RegionRepository {
         {
           name,
           error: error.message,
-          erro_stack: error.stack,
+          error_stack: error.stack,
         },
         '[RegionPostgresqlRepository] error at creating region',
       );
@@ -30,15 +38,17 @@ export class RegionPostgresqlRepository implements RegionRepository {
   async getById(id: string): Promise<Region> {
     let region: Region;
     try {
-      region = await this.db
+      const result = await this.db
         .select()
         .from(regionTable)
-        .where(eq(regionTable.id, id))[0];
+        .where(eq(regionTable.id, id));
+      region = result[0];
     } catch (error) {
       this.logger.error(
         {
           id: id,
-          error: error,
+          error: error.message,
+          error_stack: error.stack,
         },
         'unexpected error at retrieving region',
       );
@@ -60,13 +70,52 @@ export class RegionPostgresqlRepository implements RegionRepository {
 
   async getList(): Promise<Region[]> {
     try {
-      const regions = this.db.select().from(regionTable);
+      const regions = await this.db.select().from(regionTable);
       this.logger.info('regions retrieved');
       return regions;
     } catch (error) {
       this.logger.error(
         {
-          error,
+          error: error.message,
+          error_stack: error.stack,
+        },
+        'unexpected error at retrieving regions',
+      );
+      throw error;
+    }
+  }
+
+  async retrieveFull(id: string): Promise<RegionDetailed> {
+    try {
+      const regionDto = await this.db.query.regionTable.findFirst({
+        where: eq(regionTable.id, id),
+        with: {
+          towns: {
+            with: {
+              buildings: true,
+            },
+          },
+        },
+      });
+      this.logger.info('regions retrieved');
+
+      const region: RegionDetailed = {
+        ...regionDto,
+        towns: regionDto.towns.map((t) => ({
+          ...t,
+          buildings: t.buildings.map((b) => ({
+            ...b,
+            type: buildingTypeEnum[b.type],
+          })),
+        })),
+      };
+
+      return region;
+    } catch (error) {
+      this.logger.error(
+        {
+          error: error.message,
+          error_stack: error.stack,
         },
         'unexpected error at retrieving regions',
       );

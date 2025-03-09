@@ -1,4 +1,4 @@
-import { Controller, Get, Inject, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Inject, Param, Post } from '@nestjs/common';
 import {
   CreateTownUseCase,
   GetByIdTownUseCase,
@@ -13,16 +13,16 @@ class CreateTownRequest {
 
   @IsUUID()
   @IsNotEmpty()
-  region: string;
+  regionId: string;
 }
 
 interface TownResponse {
   id: string;
   name: string;
-  region: string;
+  regionId: string;
 }
 
-@Controller('Towns')
+@Controller('towns')
 export class TownController {
   constructor(
     @Inject('LOGGER')
@@ -34,12 +34,21 @@ export class TownController {
   ) {}
 
   @Post()
-  async createTown(createTownRequest: CreateTownRequest): Promise<void> {
+  async createTown(
+    @Body() createTownRequest: CreateTownRequest,
+  ): Promise<void> {
     try {
       this.logger.info({ name: createTownRequest.name }, 'creting town');
       await this.createTownUseCase.do(createTownRequest);
     } catch (error) {
-      this.logger.error({ error, createTownRequest }, 'error at creatig Town');
+      this.logger.error(
+        {
+          error: error.message,
+          error_stack: error.stack,
+          createTownRequest,
+        },
+        'error at creatig Town',
+      );
     }
   }
 
@@ -49,7 +58,7 @@ export class TownController {
       this.logger.info({ id }, 'retrieving town');
       return await this.getByIdTownUseCase.do(id);
     } catch (error) {
-      this.logger.error({ error, id }, 'error at retrieving Town');
+      this.logger.error({ error: error.stack, id }, 'error at retrieving Town');
     }
   }
 }

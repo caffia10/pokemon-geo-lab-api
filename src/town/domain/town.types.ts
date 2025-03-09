@@ -1,7 +1,13 @@
+import { Building } from 'src/building/domain/building.types';
+
 export interface Town {
   id: string;
   name: string;
-  region: string;
+  regionId: string;
+}
+
+export interface TownDetailed extends Town {
+  buildings: Building[];
 }
 
 export type TownDto = Omit<Town, 'id'>;

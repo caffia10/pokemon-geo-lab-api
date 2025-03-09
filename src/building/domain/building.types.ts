@@ -1,8 +1,17 @@
+export enum buildingTypeEnum {
+  Center = 'center',
+  laboratory = 'laboratory',
+  Gym = 'gym',
+  Police = 'police',
+  House = 'house',
+  Unknown = 'unkown',
+}
+
 export interface Building {
   id: string;
   name: string;
-  region: string;
-  town: string;
+  townId: string;
+  type: buildingTypeEnum;
 }
 
 export type BuildingDto = Omit<Building, 'id'>;

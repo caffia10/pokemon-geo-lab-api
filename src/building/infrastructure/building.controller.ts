@@ -1,32 +1,33 @@
-import { Controller, Get, Inject, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Inject, Param, Post } from '@nestjs/common';
 import {
   CreateBuildingUseCase,
   GetByIdBuildingUseCase,
 } from '../application/usecases.interfaces';
 import pino from 'pino';
-import { IsString, IsNotEmpty } from 'class-validator';
+import { IsString, IsNotEmpty, IsUUID } from 'class-validator';
+import { buildingTypeEnum } from '../domain/building.types';
 
 class CreateBuildingRequest {
   @IsString()
   @IsNotEmpty()
   name: string;
 
-  @IsString()
+  @IsUUID()
   @IsNotEmpty()
-  region: string;
+  townId: string;
 
   @IsString()
   @IsNotEmpty()
-  town: string;
+  type: buildingTypeEnum;
 }
 
 interface BuildingResponse {
   name: string;
-  region: string;
-  town: string;
+  townId: string;
+  type: buildingTypeEnum;
 }
 
-@Controller('Buildings')
+@Controller('buildings')
 export class BuildingController {
   constructor(
     @Inject('LOGGER')
@@ -39,7 +40,7 @@ export class BuildingController {
 
   @Post()
   async createBuilding(
-    createBuildingRequest: CreateBuildingRequest,
+    @Body() createBuildingRequest: CreateBuildingRequest,
   ): Promise<void> {
     try {
       this.logger.info(
@@ -49,7 +50,11 @@ export class BuildingController {
       await this.createBuildingUseCase.do(createBuildingRequest);
     } catch (error) {
       this.logger.error(
-        { error, createBuildingRequest },
+        {
+          error: error.message,
+          error_stack: error.stack,
+          createBuildingRequest,
+        },
         'error at creatig Building',
       );
     }

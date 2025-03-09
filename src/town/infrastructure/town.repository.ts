@@ -19,7 +19,8 @@ export class TownPostgresqlRepository implements TownRepository {
       this.logger.error(
         {
           name: town.name,
-          error: error,
+          error: error.message,
+          error_stack: error.stack,
         },
         'error at creating town',
       );
@@ -29,10 +30,11 @@ export class TownPostgresqlRepository implements TownRepository {
   async getById(id: string): Promise<Town> {
     let town: Town;
     try {
-      town = await this.db
+      const result = await this.db
         .select()
         .from(townTable)
-        .where(eq(townTable.id, id))[0];
+        .where(eq(townTable.id, id));
+      town = result[0];
     } catch (error) {
       this.logger.error(
         {

@@ -13,9 +13,9 @@ export const typeEnum = pgEnum('types', [
 export const buildingTable = pgTable('building', {
   id: uuid('id').defaultRandom().primaryKey(),
   name: varchar('name', { length: 150 }).notNull(),
-  town: uuid('town_id')
+  townId: uuid('town_id')
     .notNull()
     .references(() => townTable.id),
   type: typeEnum().default('unknown'),
-  created_at: timestamp('created_at'),
+  createdAt: timestamp('created_at'),
 });

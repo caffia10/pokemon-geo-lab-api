@@ -3,13 +3,15 @@ import { DefaultCreateRegionUseCase } from './application/create.region.usecase'
 import { DefaultGetByIdRegionUseCase } from './application/getById.region.usecase';
 import {
   CreateRegionUseCase,
-  GetByIdRegionUseCase,
+  RetrieveFullRegionUseCase,
   GetRegionListUseCase,
+  GetByIdRegionUseCase,
 } from './application/usecases.interfaces';
 import { RegionController } from './infrastructure/region.controller';
 import { DefaultGetProfessorListUseCase } from './application/getList.region.usecase';
 import { RegionPostgresqlRepository } from './infrastructure/region.repository';
 import { RegionRepository } from './domain/region.types';
+import { DefaultRetrieveFullRegionUseCase } from './application/retrieveFull.region.usecase';
 
 @Module({
   controllers: [RegionController],
@@ -30,6 +32,10 @@ import { RegionRepository } from './domain/region.types';
       provide: RegionRepository,
       useClass: RegionPostgresqlRepository,
     },
+    {
+      provide: RetrieveFullRegionUseCase,
+      useClass: DefaultRetrieveFullRegionUseCase,
+    },
   ],
   exports: [
     {
@@ -43,6 +49,10 @@ import { RegionRepository } from './domain/region.types';
     {
       provide: GetRegionListUseCase,
       useClass: DefaultGetProfessorListUseCase,
+    },
+    {
+      provide: RetrieveFullRegionUseCase,
+      useClass: DefaultRetrieveFullRegionUseCase,
     },
   ],
 })
