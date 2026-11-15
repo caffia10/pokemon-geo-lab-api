@@ -8,10 +8,7 @@ import { DataBase } from 'src/server/infrastructure/db/db.type';
 import pino from 'pino';
 import { regionTable } from './region.schema';
 import { eq } from 'drizzle-orm';
-import { townTable } from 'src/town/infrastructure/town.schema';
-import { buildingTable } from 'src/building/infrastructure/building.schema';
-import { Building, buildingTypeEnum } from 'src/building/domain/building.types';
-import { TownDetailed } from 'src/town/domain/town.types';
+import { buildingTypeEnum } from 'src/building/domain/building.types';
 
 @Injectable()
 export class RegionPostgresqlRepository implements RegionRepository {
